@@ -1,0 +1,7 @@
+GET localhost:8080/persons/person/1
+
+###
+POST localhost:8080/persons/person
+
+###
+GET localhost:8080/persons/person/1

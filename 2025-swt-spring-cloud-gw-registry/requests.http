@@ -1,0 +1,17 @@
+### httpbin.org
+GET http://httpbin.org:80/get
+
+## basic-gw-demo starten
+### Header hinzufuegen
+GET localhost:8080/get
+
+### Path Rewrite
+GET localhost:8080/get-wo-headers
+
+### Path Rewrite Query Params
+GET localhost:8080/response-headers
+
+## Service stoppen
+## Docker Compose starten
+### Weiterleitung an Service
+GET localhost:8080/service/greeting?name=Blaa

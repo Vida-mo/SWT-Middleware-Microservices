@@ -1,0 +1,86 @@
+services:
+
+  gateway:
+      build:
+        context: ./gateway
+      container_name: gateway
+      ports:
+        - 8080:8760
+      networks:
+        - gw-demo
+      depends_on:
+        registry:
+          condition: service_healthy
+
+  service-a:
+    build:
+      context: ./service
+    container_name: service-a
+    ports:
+      - 8762:8762
+    networks:
+      - gw-demo
+    depends_on:
+      registry:
+        condition: service_healthy
+
+  service-b:
+    build:
+      context: ./service
+    container_name: service-b
+    ports:
+      - 8763:8762
+    networks:
+      - gw-demo
+    depends_on:
+      registry:
+        condition: service_healthy
+
+
+  registry:
+    build:
+      context: ./registry
+    container_name: registry
+    ports:
+      - 8761:8761
+    expose:
+      - 8761
+    networks:
+      - gw-demo
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://registry:8761/actuator/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+
+
+networks:
+  gw-demo:
+    name: gw-demo
+    driver: bridge
+
+#    build:
+#      context: ./service
+#    container_name: service
+#    ports:
+#      - 8762:8762
+#    expose:
+#      - 8762
+#    networks:
+#      - gw-demo
+#    healthcheck:
+#      test: ["CMD-SHELL", "curl -f http://registry:8761/eureka || exit 1"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 30s
+#    depends_on:
+#      - registry
+
+
+
+
+
+

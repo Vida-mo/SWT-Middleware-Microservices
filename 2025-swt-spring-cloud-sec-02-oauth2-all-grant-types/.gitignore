@@ -1,0 +1,53 @@
+# Eclipse / Spring Tool Suite (STS)
+.apt_generated
+.classpath90
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# IntelliJ IDEA
+.idea/**
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Build-Verzeichnisse und Abhängigkeiten
+.gradle/
+build/
+target/
+bin/
+
+# Gradle Wrapper
+!gradle/wrapper/gradle-wrapper.jar
+
+# Maven Wrapper
+.mvn/wrapper/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Temporäre und Hilfsdateien
+HELP.md
+TODO
+/*.db
+/axon-server-se
+
+# General OS Files (e.g., macOS and Windows)
+.DS_Store
+Thumbs.db
+keystore.jks
+

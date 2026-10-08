@@ -1,0 +1,108 @@
+services:
+  axonserver: #<.>
+    image: 'axoniq/axonserver:latest'  # <.>
+#    container_name: axonserver
+    hostname: axonserver
+    environment: # <.>
+      - 'AXONIQ_AXONSERVER_STANDALONE=TRUE'
+      - 'AXONIQ_AXONSERVER_DEVMODE=TRUE'
+    volumes:
+    # Pfade absolut angeben, falls die relativen Pfade nicht funkionieren
+#      - /X/bike-rental-quick-start/axon-server-se/data:/axonserver/data
+#      - /X/bike-rental-quick-start/axon-server-se/events:/axonserver/events
+#      - /X/bike-rental-quick-start/axon-server-se/config:/axonserver/config
+      - ./axon-server-se/data:/axonserver/data
+      - ./axon-server-se/events:/axonserver/events
+      - ./axon-server-se/config:/axonserver/config
+    ports: # <.>
+      - '8024:8024'  # <.>
+      - '8124:8124'  # <.>
+    networks:
+      - axon-demo
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://axonserver:8024/actuator/health" ]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+
+  service-command:
+    build:
+      context: ./microservices/rental-command
+#    container_name: rental-command
+#    hostname: rental-command
+    environment:
+      - axon_axonserver_servers=axonserver
+    ports:
+      - '10100:8080'
+    networks:
+      - axon-demo
+    depends_on:
+      axonserver:
+        condition: service_healthy
+
+  service-payment:
+    build:
+      context: ./microservices/rental-payment
+#    container_name: rental-payment
+#    hostname: rental-payment
+    environment:
+      - axon_axonserver_servers=axonserver
+    ports:
+      - '10101:8080'
+    networks:
+      - axon-demo
+    depends_on:
+      axonserver:
+        condition: service_healthy
+
+  service-only-payment:
+    build:
+      context: ./microservices/payment
+    #    container_name: rental-payment
+    #    hostname: rental-payment
+    environment:
+      - axon_axonserver_servers=axonserver
+    ports:
+      - '10106:8080'
+    networks:
+      - axon-demo
+    depends_on:
+      axonserver:
+        condition: service_healthy
+
+  service-query:
+    build:
+      context: ./microservices/rental-query
+    #    container_name: rental-payment
+    #    hostname: rental-payment
+    environment:
+      - axon_axonserver_servers=axonserver
+      - SPRING_H2_CONSOLE_SETTINGS_WEB_ALLOW_OTHERS=true
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb
+    ports:
+      - '10102:8080'
+    networks:
+      - axon-demo
+    depends_on:
+      axonserver:
+        condition: service_healthy
+
+  service-ui:
+    build:
+      context: ./microservices/rental-ui
+#    container_name: service-ui
+    hostname: service-ui
+    environment:
+      - axon_axonserver_servers=axonserver
+    ports:
+      - '10103:8080'
+    networks:
+      - axon-demo
+    depends_on:
+      axonserver:
+        condition: service_healthy
+
+networks:
+  axon-demo:
+    driver: bridge
+

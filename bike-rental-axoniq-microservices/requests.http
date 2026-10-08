@@ -1,0 +1,93 @@
+### Register a new bike
+# @name registerBike
+POST {{rental}}/bikes?bikeType=city&location=Utrecht
+Accept: application/json
+
+### Generate bikes (erstellt 60 Bikes)
+# @dependsOn=registerBike
+POST {{rental}}/bikes/batch?count=60&type=city
+Accept: application/json
+
+
+### List all
+# Show available bikes
+GET {{rental}}/bikes
+Accept: application/json
+
+> {%
+    try {
+        var bikes = response.body; // Falls body bereits ein JSON-Objekt ist, kein Parse nötig
+
+        client.log("Anzahl der Bikes: " + bikes.length);
+        client.log("Erstes Bike: " + JSON.stringify(bikes[0], null, 2));
+
+        if (bikes.length >= 6) {
+            client.global.set("bikeId1", bikes[0].bikeId);
+            client.global.set("bikeId6", bikes[5].bikeId);
+            client.log("Überprüfung: bikeId1 = " + client.global.get("bikeId1"));
+            client.log("Überprüfung: bikeId6 = " + client.global.get("bikeId6"));
+            client.log("Gespeicherte bikeId1: " + bikes[0].bikeId);
+            client.log("Gespeicherte bikeId6: " + bikes[5].bikeId);
+        } else {
+            client.log("Fehler: Weniger als 6 Bikes gefunden.");
+        }
+    } catch (e) {
+        client.log("Fehler beim JSON-Parsen: " + e.message);
+        client.log("Rohdaten: " + JSON.stringify(response.body, null, 2));
+    }
+%}
+
+### Bike status (Erstes Bike)
+GET {{rental}}/bikes/{{bikeId1}}
+Accept: application/json
+
+### Request Bike
+# Request one of the available bikes
+POST {{rental}}/requestBike?bikeId={{bikeId1}}
+Accept: application/json
+
+> {%
+    if (response.body) {
+        client.global.set("paymentReference", response.body.trim()); // String ohne Leerzeichen speichern
+        client.log("Gespeicherte paymentReference: " + client.global.get("paymentReference"));
+    } else {
+        client.log("Fehler: response.body ist leer.");
+    }
+%}
+
+### Find paymentID
+# Find the payment for a specific payment reference
+GET {{payment}}/findPayment?reference={{paymentReference}}
+Accept: application/json
+
+> {%
+    if (response.body && response.body.trim().length > 0) {
+        client.global.set("paymentId", response.body.trim());
+        client.log("Gespeicherte paymentId: " + client.global.get("paymentId"));
+    } else {
+        client.log("Fehler: response.body ist leer oder ungültig.");
+        throw new Error("Abbruch: Keine paymentId erhalten.");
+    }
+%}
+
+### Accept Payment
+# Accept a payment
+POST {{payment}}/acceptPayment?id={{paymentId}}
+Accept: application/json
+
+#### Reject Payment
+## Reject a payment
+#POST {{payment}}/rejectPayment?id=d8be5441-2fde-4bc4-b784-f375734509f9
+#Accept: application/json
+
+### Bike status (2)
+# Show bike status
+GET {{rental}}/bikes/{{bikeId1}}
+Accept: application/json
+
+### Return bike
+# Return a bike
+POST {{rental}}/returnBike?bikeId={{bikeId1}}
+Accept: application/json
+
+

@@ -1,0 +1,7 @@
+- in `2025-swt-spring-cloud-sec-02-oauth2-all-grant-types/my-oa-all-gt-gateway/src/main/resources/application.properties` die gewünschten Zeilen auskommentieren je nach Flow/Grant Type
+- Projekte mit Maven bauen mit `mvn install`
+- `docker compose up -d`
+- localhost:8080/api/private aufrufen
+- Anmelden mit `user1` `password`
+- Im Browser Anfragen verfolgen
+- Abmelden mit `localhost:8080/logout`

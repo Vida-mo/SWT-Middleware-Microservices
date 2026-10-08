@@ -1,0 +1,42 @@
+services:
+  uaa:
+    image: cloudfoundry/uaa:77.25.0
+    platform: linux/amd64  # Plattform spezifizieren
+    container_name: uaa
+    restart: always
+    volumes:
+      - type: bind
+        source: ./uaa/uaa.yml
+        target: /config/uaa.yml
+      - type: bind
+        source: ./uaa/log4j2.properties
+        target: /workspace/WEB-INF/classes/log4j2.properties
+    environment:
+      - CLOUDFOUNDRY_CONFIG_PATH=/config
+    ports:
+      - "8070:8080"
+    networks:
+      - oa-all-grant-types-demo
+
+  mygateway:
+    build:
+      context: my-oa-all-gt-gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - oa-all-grant-types-demo
+
+  myresource:
+    build:
+      context: my-oa-all-gt-resource
+    container_name: resource
+    ports:
+      - "9000:9000"
+    networks:
+      - oa-all-grant-types-demo
+
+networks:
+  oa-all-grant-types-demo:
+    name: oa-all-grant-types-demo
+    driver: bridge
